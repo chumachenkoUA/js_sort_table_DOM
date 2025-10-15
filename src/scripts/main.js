@@ -18,37 +18,42 @@ const toNumber = (value) => {
   return Number(cleaned);
 };
 
-table.addEventListener('click', (e) => {
-  const th = e.target.closest('th');
+if (table) {
+  table.addEventListener('click', (e) => {
+    const th = e.target.closest('th');
 
-  if (!th) {
-    return;
-  }
+    if (!th) {
+      return;
+    }
 
-  const columnIndex = th.cellIndex;
-  const tBodies = [...table.tBodies];
+    const columnIndex = th.cellIndex;
+    const tBodies = [...table.tBodies];
 
-  if (!tBodies) {
-    return;
-  }
+    if (!tBodies || tBodies.length === 0) {
+      return;
+    }
 
-  tBodies.forEach((tBody) => {
-    const rows = [...tBody.rows];
+    tBodies.forEach((tBody) => {
+      const rows = [...tBody.rows];
 
-    rows.sort((rowA, rowB) => {
-      const a = rowA.cells[columnIndex].textContent.trim();
-      const b = rowB.cells[columnIndex].textContent.trim();
+      rows.sort((rowA, rowB) => {
+        const a = rowA.cells[columnIndex].textContent.trim();
+        const b = rowB.cells[columnIndex].textContent.trim();
 
-      const numberA = toNumber(a);
-      const numberB = toNumber(b);
+        const numberA = toNumber(a);
+        const numberB = toNumber(b);
 
-      if (!isNaN(numberA) && !isNaN(numberB)) {
-        return numberA - numberB;
-      }
+        if (!isNaN(numberA) && !isNaN(numberB)) {
+          return numberA - numberB;
+        }
 
-      return a.localeCompare(b);
+        return a.localeCompare(b, undefined, {
+          numeric: true,
+          sensitivity: 'base',
+        });
+      });
+
+      tBody.append(...rows);
     });
-
-    tBody.append(...rows);
   });
-});
+}
